@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trabalho 3 - Lógica de Programação</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Additional styles for better code block presentation */
+        pre {
+            background-color: #1f2937; /* Tailwind gray-800 */
+            color: #e5e7eb; /* Tailwind gray-200 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem; /* text-sm */
+        }
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        h1, h2, h3 {
+            font-weight: 600; /* semibold */
+        }
+        ul, ol {
+            list-style-position: inside;
+        }
+        ul ul, ol ol {
+            margin-left: 1.5rem;
+        }
+        li {
+            margin-bottom: 0.5rem;
+        }
+        .content-section {
+            background-color: #ffffff; /* white */
+            padding: 1.5rem; /* p-6 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
+            margin-bottom: 1.5rem; /* mb-6 */
+        }
+        .content-section h2 {
+            border-bottom: 2px solid #e5e7eb; /* border-gray-200 */
+            padding-bottom: 0.5rem; /* pb-2 */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800 p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <header class="bg-blue-600 text-white p-6 rounded-lg shadow-lg mb-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold">📚 Trabalho 3 (AP3) – Sistema de Gerenciamento de Biblioteca</h1>
+            <p class="mt-2 text-lg">Lógica de Programação</p>
+        </header>
+
+        <div class="content-section">
+            <h2 class="text-2xl text-blue-700 mb-4">Objetivo</h2>
+            <p class="text-gray-700 leading-relaxed">
+                O objetivo deste trabalho final é consolidar o aprendizado da disciplina de Lógica de Programação, aplicando os conceitos em Python. Você deverá desenvolver um sistema de gerenciamento de biblioteca, utilizando <strong>funções</strong> para modularizar o código e <strong><code>dataclasses</code></strong> (ou estruturas de dados equivalentes, como dicionários bem definidos ou classes simples) para representar as entidades principais do sistema (Livros, Usuários, Empréstimos). Além da entrega do código, haverá uma <strong>apresentação oral</strong> onde você explicará a lógica implementada, as estruturas de dados utilizadas e o funcionamento geral do seu programa.
+            </p>
+        </div>
+
+        <div class="content-section">
+            <h2 class="text-2xl text-blue-700 mb-4">Sistema de Data Simulado e Gerenciamento de Tempo</h2>
+            <p class="text-gray-700 leading-relaxed mb-4">
+                Para todas as operações envolvendo datas (empréstimo, devolução prevista, devolução efetiva, cálculo de atraso e multa), o sistema <strong>não utilizará o módulo <code>datetime</code> do Python</strong>. Em vez disso, você implementará um <strong>sistema de data simulado</strong>, baseado em um contador numérico inteiro que representa o "dia atual do sistema".
+            </p>
+            <p class="text-gray-700 leading-relaxed mb-4">
+                Este contador deverá ser inicializado no início do seu programa:
+            </p>
+            <pre><code># No início do seu programa (escopo global ou gerenciado adequadamente)
+dia_atual_sistema = 1</code></pre>
+            <p class="text-gray-700 leading-relaxed my-4">
+                A cada empréstimo ou devolução, as operações serão registradas com o valor corrente deste <code>dia_atual_sistema</code>. Para controlar a passagem do tempo, você implementará um menu específico.
+            </p>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Exemplo de Lógica de Tempo:</h3>
+            <p class="text-gray-700 leading-relaxed">
+                Um empréstimo feito quando <code>dia_atual_sistema = 5</code> por um aluno (prazo de 7 dias), terá sua devolução prevista para o "dia" <code>12</code> (5 + 7). Se a devolução ocorrer quando <code>dia_atual_sistema</code> for <code>14</code>, haverá 2 dias de atraso.
+            </p>
+        </div>
+
+        <div class="content-section">
+            <h2 class="text-2xl text-blue-700 mb-4">Menu Principal Sugerido</h2>
+            <p class="text-gray-700 leading-relaxed mb-3">O programa deve apresentar um menu com as seguintes opções principais:</p>
+            <ol class="list-decimal text-gray-700 leading-relaxed pl-5">
+                <li>Gerenciar Livros</li>
+                <li>Gerenciar Usuários</li>
+                <li>Realizar Empréstimo</li>
+                <li>Realizar Devolução</li>
+                <li>Relatórios</li>
+                <li>Gerenciar Tempo (Avançar/Consultar Dias)</li>
+                <li>Sair</li>
+            </ol>
+        </div>
+
+        <div class="content-section">
+            <h2 class="text-2xl text-blue-700 mb-4">Detalhamento das Funcionalidades</h2>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">1. Gerenciar Livros (Submenu)</h3>
+                <ul class="list-disc text-gray-700 leading-relaxed pl-5">
+                    <li><strong>Cadastrar Novo Livro:</strong>
+                        <ul class="list-circle pl-5">
+                            <li>Solicitar: Código (único), Título, Autor, Ano de Publicação (como número), Gênero, Quantidade Total de Exemplares.</li>
+                            <li>A <code>quantidade_disponivel</code> inicialmente será igual à <code>quantidade_total</code>.</li>
+                            <li>Armazenar usando uma estrutura de dados para Livro (recomendado: <code>dataclass</code>).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Listar Todos os Livros:</strong>
+                        <ul class="list-circle pl-5">
+                            <li>Exibir todos os detalhes dos livros cadastrados, incluindo a <code>quantidade_disponivel</code>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Buscar Livro:</strong>
+                        <ul class="list-circle pl-5">
+                            <li>Permitir busca por código, título ou autor.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">2. Gerenciar Usuários (Submenu)</h3>
+                <ul class="list-disc text-gray-700 leading-relaxed pl-5">
+                    <li><strong>Cadastrar Novo Usuário:</strong>
+                        <ul class="list-circle pl-5">
+                            <li>Solicitar: ID do Usuário (único), Nome, <strong>Tipo (deve ser "aluno" ou "professor")</strong>. Validar a entrada do tipo.</li>
+                            <li>Armazenar usando uma estrutura de dados para Usuario (recomendado: <code>dataclass</code>).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Listar Todos os Usuários:</strong>
+                        <ul class="list-circle pl-5">
+                            <li>Exibir ID, Nome e Tipo de todos os usuários.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">3. Realizar Empréstimo</h3>
+                <ul class="list-disc text-gray-700 leading-relaxed pl-5">
+                    <li>Solicitar o ID do Usuário e o Código do Livro.</li>
+                    <li>Utilizar o <code>dia_atual_sistema</code> para registrar o empréstimo.</li>
+                    <li><strong>Validações:</strong>
+                        <ul class="list-circle pl-5">
+                            <li>Verificar se o usuário existe.</li>
+                            <li>Verificar se o livro existe.</li>
+                            <li>Verificar se há exemplares do livro disponíveis (<code>quantidade_disponivel > 0</code>).</li>
+                        </ul>
+                    </li>
+                    <li>Se todas as validações passarem:
+                        <ul class="list-circle pl-5">
+                            <li>Identificar o tipo do usuário ("aluno" ou "professor").</li>
+                            <li>Definir o prazo do empréstimo: <strong>7 dias para "aluno"</strong> e <strong>10 dias para "professor"</strong>.</li>
+                            <li>Registrar o empréstimo.</li>
+                            <li>Definir <code>dia_emprestimo</code> como o <code>dia_atual_sistema</code>.</li>
+                            <li>Definir <code>dia_devolucao_prevista</code> como <code>dia_emprestimo + prazo_do_usuario</code>.</li>
+                            <li>Decrementar a <code>quantidade_disponivel</code> do livro.</li>
+                            <li>Armazenar os dados do empréstimo usando uma estrutura para Emprestimo (recomendado: <code>dataclass</code>, contendo ID do usuário, código do livro, <code>dia_emprestimo</code>, <code>dia_devolucao_prevista</code>, status "ativo").</li>
+                        </ul>
+                    </li>
+                    <li>Exibir mensagem de sucesso ou falha (com o motivo).</li>
+                </ul>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">4. Realizar Devolução</h3>
+                <ul class="list-disc text-gray-700 leading-relaxed pl-5">
+                    <li>Solicitar o ID do Usuário e o Código do Livro a ser devolvido.</li>
+                    <li>Utilizar o <code>dia_atual_sistema</code> para registrar a devolução.</li>
+                    <li><strong>Validações:</strong>
+                        <ul class="list-circle pl-5">
+                            <li>Verificar se existe um empréstimo ativo para aquele usuário e livro.</li>
+                        </ul>
+                    </li>
+                    <li>Se o empréstimo for encontrado:
+                        <ul class="list-circle pl-5">
+                            <li>Registrar <code>dia_devolucao_efetiva</code> como o <code>dia_atual_sistema</code>.</li>
+                            <li>Incrementar a <code>quantidade_disponivel</code> do livro.</li>
+                            <li>Alterar o status do empréstimo para "devolvido".</li>
+                            <li><strong>Cálculo de Multa:</strong> Se <code>dia_devolucao_efetiva > dia_devolucao_prevista</code> do empréstimo, calcular multa. A multa será: <code>(dia_devolucao_efetiva - dia_devolucao_prevista) * VALOR_MULTA_POR_DIA</code> (ex: <code>VALOR_MULTA_POR_DIA = 1</code> unidade monetária, pode ser um valor fixo como R$1.00). Exibir o valor da multa.</li>
+                        </ul>
+                    </li>
+                    <li>Exibir mensagem de sucesso ou falha.</li>
+                </ul>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">5. Relatórios (Submenu)</h3>
+                <ul class="list-disc text-gray-700 leading-relaxed pl-5">
+                    <li><strong>Livros Emprestados Atualmente:</strong>
+                        <ul class="list-circle pl-5">
+                            <li>Listar todos os livros com status de empréstimo "ativo", mostrando o título do livro, nome do usuário e o <code>dia_devolucao_prevista</code>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Livros com Devolução em Atraso:</strong>
+                        <ul class="list-circle pl-5">
+                            <li>Utilizar o <code>dia_atual_sistema</code> como referência.</li>
+                            <li>Listar os empréstimos ativos cujo <code>dia_devolucao_prevista</code> é menor que o <code>dia_atual_sistema</code>.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">6. Gerenciar Tempo (Avançar/Consultar Dias) (Submenu)</h3>
+                <p class="text-gray-700 leading-relaxed mb-3">Esta funcionalidade permitirá simular a passagem do tempo no sistema.</p>
+                <pre><code># Variável global (ou gerenciada de forma acessível)
+# dia_atual_sistema = 1 # Definida no início do programa principal
+
+def menu_gerenciar_tempo(dia_sistema_atual_param): # Exemplo recebendo e retornando
+    """Gerencia a passagem do tempo no sistema."""
+    # Se dia_atual_sistema for global, use: global dia_atual_sistema
+    # Neste exemplo, passamos como parâmetro e retornamos o valor modificado.
+    
+    while True:
+        print("\\n--- Gerenciar Tempo ---")
+        print(f"Dia Atual do Sistema: {dia_sistema_atual_param}")
+        print("1. Avançar 1 dia")
+        print("2. Avançar 7 dias (1 semana)")
+        print("3. Avançar N dias")
+        print("4. Consultar dia atual")
+        print("5. Voltar ao Menu Principal")
+        
+        opcao_tempo = input("Escolha uma opção: ")
+
+        if opcao_tempo == '1':
+            dia_sistema_atual_param += 1
+            print(f"Sistema avançou para o dia: {dia_sistema_atual_param}")
+        elif opcao_tempo == '2':
+            dia_sistema_atual_param += 7
+            print(f"Sistema avançou 7 dias. Novo dia: {dia_sistema_atual_param}")
+        elif opcao_tempo == '3':
+            try:
+                n_dias = int(input("Quantos dias deseja avançar? "))
+                if n_dias > 0:
+                    dia_sistema_atual_param += n_dias
+                    print(f"Sistema avançou {n_dias} dias. Novo dia: {dia_sistema_atual_param}")
+                else:
+                    print("Por favor, insira um número positivo de dias.")
+            except ValueError:
+                print("Entrada inválida. Por favor, insira um número.")
+        elif opcao_tempo == '4':
+            print(f"O dia atual do sistema é: {dia_sistema_atual_param}")
+        elif opcao_tempo == '5':
+            print("Retornando ao Menu Principal...")
+            break # Sai do loop do menu_gerenciar_tempo
+        else:
+            print("Opção inválida. Tente novamente.")
+    return dia_sistema_atual_param # Retorna o dia atualizado
+
+# No loop principal do seu programa, quando a opção "Gerenciar Tempo" for escolhida:
+# dia_atual_sistema = menu_gerenciar_tempo(dia_atual_sistema)</code></pre>
+                <p class="text-gray-700 leading-relaxed mt-3"><strong>Nota:</strong> Você deverá integrar esta função ou uma lógica similar ao seu menu principal. A forma como <code>dia_atual_sistema</code> é acessada (global ou por parâmetro/retorno) dependerá da estrutura do seu código.</p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2 class="text-2xl text-blue-700 mb-4">Requisitos Obrigatórios</h2>
+            <ol class="list-decimal text-gray-700 leading-relaxed pl-5">
+                <li><strong>Linguagem:</strong> O sistema deve ser desenvolvido em <strong>Python</strong>.</li>
+                <li><strong>Estruturas de Dados:</strong>
+                    <ul class="list-disc pl-5">
+                        <li>Utilizar <strong><code>dataclasses</code></strong> (ou estruturas de dados equivalentes como dicionários bem definidos ou classes simples) para representar <code>Livro</code>, <code>Usuario</code> (com atributo <code>tipo</code>), e <code>Emprestimo</code>. Cada entidade deve ter atributos claros e bem definidos.</li>
+                        <li>Utilizar <strong>listas</strong> para armazenar as coleções de livros, usuários e empréstimos.</li>
+                    </ul>
+                </li>
+                <li><strong>Modularização com Funções:</strong>
+                    <ul class="list-disc pl-5">
+                        <li>O código deve ser <strong>altamente modularizado utilizando funções</strong>. Cada funcionalidade principal (cadastrar livro, realizar empréstimo, calcular multa, gerenciar tempo, etc.) deve ser implementada em uma ou mais funções.</li>
+                        <li>Funções devem ter responsabilidades claras.</li>
+                    </ul>
+                </li>
+                <li><strong>Estruturas de Controle:</strong>
+                    <ul class="list-disc pl-5">
+                        <li>Uso adequado de estruturas de repetição (<code>while</code>, <code>for</code>) para menus, listagens, e outras operações repetitivas.</li>
+                        <li>Uso adequado de estruturas de decisão (<code>if</code>/<code>elif</code>/<code>else</code>, <code>match-case</code> se aplicável) para validações, opções de menu, e lógica condicional.</li>
+                    </ul>
+                </li>
+                <li><strong>Sistema de Data Simulado e Lógica de Prazos:</strong>
+                    <ul class="list-disc pl-5">
+                        <li>Implementar e utilizar o sistema de contagem de dias (variável numérica inteira) conforme descrito.</li>
+                        <li>Aplicar corretamente os prazos de devolução diferenciados (7 dias para alunos, 10 dias para professores) e calcular multas com base no <code>dia_atual_sistema</code>.</li>
+                    </ul>
+                </li>
+                <li><strong>Interatividade e Usabilidade:</strong>
+                    <ul class="list-disc pl-5">
+                        <li>Menu principal claro e submenus, incluindo o de gerenciamento de tempo.</li>
+                        <li>Mensagens informativas para o usuário (sucesso, erro, instruções).</li>
+                        <li>Validação básica das entradas do usuário (ex: tipo de usuário).</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <div class="content-section">
+            <h2 class="text-2xl text-blue-700 mb-4">Critérios de Avaliação</h2>
+            <ol class="list-decimal text-gray-700 leading-relaxed pl-5">
+                <li><strong>Funcionalidade:</strong> O sistema cumpre todos os requisitos obrigatórios descritos? As operações de cadastro, empréstimo, devolução, relatórios e gerenciamento de tempo funcionam corretamente?</li>
+                <li><strong>Uso de Funções e Modularidade:</strong> O código está bem dividido em funções com responsabilidades claras? As funções são bem utilizadas para organizar e simplificar o código?</li>
+                <li><strong>Uso de <code>dataclasses</code> (ou estruturas equivalentes) e Listas:</strong> As estruturas de dados para Livro, Usuário e Empréstimo estão bem definidas e são usadas consistentemente? O atributo <code>tipo</code> do usuário é corretamente utilizado?</li>
+                <li><strong>Lógica e Algoritmos:</strong> A lógica para controle de disponibilidade, prazos diferenciados, cálculo de datas simuladas, verificação de atrasos e cálculo de multas está correta? As validações são eficientes?</li>
+                <li><strong>Clareza, Organização e Comentários do Código:</strong> O código é legível, bem indentado, com nomes de variáveis e funções significativos? Há comentários explicando partes complexas ou decisões de design?</li>
+                <li><strong>Apresentação Oral:</strong> Clareza na explicação da lógica do sistema, demonstração de domínio sobre o código desenvolvido e capacidade de responder a perguntas sobre as escolhas de implementação.</li>
+            </ol>
+        </div>
+
+        <div class="content-section">
+            <h2 class="text-2xl text-blue-700 mb-4">Entregáveis</h2>
+            <ol class="list-decimal text-gray-700 leading-relaxed pl-5">
+                <li><strong>Código-fonte completo</strong> em um ou mais arquivos Python (<code>.py</code>).</li>
+                <li><strong>Apresentação Oral:</strong> Você deverá apresentar seu trabalho ao professor, explicando:
+                    <ul class="list-disc pl-5">
+                        <li>A estrutura geral do seu programa.</li>
+                        <li>Como você organizou os dados (uso das <code>dataclasses</code>/estruturas, incluindo o <code>tipo</code> de usuário).</li>
+                        <li>O papel das principais funções que você criou, incluindo a de gerenciamento de tempo.</li>
+                        <li>A lógica por trás das operações de empréstimo (com prazos diferenciados), devolução e cálculo de multas usando o sistema de data simulado.</li>
+                        <li>Demonstração do sistema em funcionamento, incluindo a simulação da passagem do tempo.</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <div class="content-section">
+            <h2 class="text-2xl text-blue-700 mb-4">Perguntas para guiar a preparação da sua apresentação oral</h2>
+            <ul class="list-disc text-gray-700 leading-relaxed pl-5">
+                <li>Como você estruturou os dados dos Livros, Usuários (incluindo o tipo) e Empréstimos? Por que escolheu essa abordagem?</li>
+                <li>Quais foram as funções mais importantes que você desenvolveu e qual a responsabilidade de cada uma? Mostre exemplos no código, incluindo como o <code>dia_atual_sistema</code> é gerenciado.</li>
+                <li>Explique detalhadamente como funciona a lógica de realizar um empréstimo, considerando os diferentes prazos para alunos e professores.</li>
+                <li>Como você implementou a funcionalidade de devolução e o cálculo de multas utilizando o sistema de data simulado?</li>
+                <li>Como funciona o seu menu de "Gerenciar Tempo" e como ele interage com o resto do sistema para testar as funcionalidades de atraso?</li>
+                <li>Quais foram os maiores desafios que você enfrentou ao desenvolver este trabalho e como você os superou?</li>
+            </ul>
+        </div>
+
+        <footer class="text-center text-gray-500 mt-12 mb-6">
+            <p>&copy; <span id="currentYear"></span> Sua Disciplina de Lógica de Programação. Boa sorte!</p>
+        </footer>
+    </div>
+
+    <script>
+        // Script to set the current year in the footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
